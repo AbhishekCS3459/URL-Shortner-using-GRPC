@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package urlService;
+
+// gRPC service definition
+service URLService {
+  rpc createKeys (Empty) returns (Key);
+}
+
+// Empty request message
+message Empty {}
+
+// Response message for key
+message Key {
+  string key = 1;
+}

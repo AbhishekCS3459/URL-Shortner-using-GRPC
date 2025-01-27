@@ -1,0 +1,6 @@
+urlService/.env
+api/.env
+ui/.env
+urlService/db/ca.pem
+urlService/node_modules
+api/node_modules

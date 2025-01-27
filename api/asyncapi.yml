@@ -1,0 +1,150 @@
+asyncapi: 3.0.0
+info:
+  title: URL Shortener AsyncAPI
+  version: 1.0.0
+  description: A simple AsyncAPI implementation for URL shortening and redirection.
+defaultContentType: application/json
+servers:
+  http:
+    host: 'localhost:3000'
+    protocol: http
+    description: Local HTTP server for the API.
+channels:
+  api.status:
+    address: api.status
+    messages:
+      subscribe.message:
+        contentType: text/plain
+        payload:
+          type: string
+    description: Channel to get the API status.
+  api.url.shorten:
+    address: api.url.shorten
+    messages:
+      publish.message:
+        payload:
+          type: object
+          properties:
+            longUrl:
+              type: string
+              description: The original URL to shorten.
+            userId:
+              type: string
+              description: The ID of the user creating the short URL.
+            metadata:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Title associated with the URL.
+                description:
+                  type: string
+                  description: Description associated with the URL.
+                imageURL:
+                  type: string
+                  description: Image URL associated with the URL.
+      subscribe.message:
+        payload:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Short URL created successfully
+            shortUrlId:
+              type: string
+            longUrl:
+              type: string
+            shortenURL:
+              type: string
+    description: Channel to create shortened URLs.
+  api.url.redirect:
+    address: api.url.redirect
+    messages:
+      subscribe.message:
+        payload:
+          type: object
+          properties:
+            shortUrl:
+              type: string
+              description: The shortened URL identifier.
+    description: Channel to redirect using a shortened URL.
+operations:
+  api.status.subscribe:
+    action: send
+    channel:
+      $ref: '#/channels/api.status'
+    summary: Get API status
+    description: Returns a welcome message indicating the API is running.
+    messages:
+      - $ref: '#/channels/api.status/messages/subscribe.message'
+  api.url.shorten.publish:
+    action: receive
+    channel:
+      $ref: '#/channels/api.url.shorten'
+    summary: Shorten a URL
+    description: Creates a shortened URL for the provided long URL.
+    messages:
+      - $ref: '#/channels/api.url.shorten/messages/publish.message'
+  api.url.shorten.subscribe:
+    action: send
+    channel:
+      $ref: '#/channels/api.url.shorten'
+    summary: Response after shortening the URL.
+    description: Returns the shortened URL and its details.
+    messages:
+      - $ref: '#/channels/api.url.shorten/messages/subscribe.message'
+  api.url.redirect.subscribe:
+    action: send
+    channel:
+      $ref: '#/channels/api.url.redirect'
+    summary: Redirect to the original URL
+    description: Redirects to the original URL based on the shortened URL.
+    messages:
+      - $ref: '#/channels/api.url.redirect/messages/subscribe.message'
+components:
+  messages:
+    shortenUrlRequest:
+      name: shortenUrlRequest
+      payload:
+        $ref: '#/components/schemas/ShortenUrlPayload'
+    shortenUrlResponse:
+      name: shortenUrlResponse
+      payload:
+        $ref: '#/components/schemas/ShortenUrlResponse'
+    redirectRequest:
+      name: redirectRequest
+      payload:
+        $ref: '#/components/schemas/RedirectPayload'
+  schemas:
+    ShortenUrlPayload:
+      type: object
+      properties:
+        longUrl:
+          type: string
+        userId:
+          type: string
+        metadata:
+          type: object
+          properties:
+            title:
+              type: string
+            description:
+              type: string
+            imageURL:
+              type: string
+    ShortenUrlResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        shortUrlId:
+          type: string
+        longUrl:
+          type: string
+        shortenURL:
+          type: string
+    RedirectPayload:
+      type: object
+      properties:
+        shortUrl:
+          type: string
