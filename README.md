@@ -1,4 +1,4 @@
-# URL Shortener AsyncAPI Documentation
+# URL Shortener 
 
 This repository implements an **AsyncAPI 3.0.0** specification for a URL Shortener service. It supports operations to shorten URLs, retrieve shortened URL details, and handle URL redirections.
 
